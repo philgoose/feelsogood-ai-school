@@ -3,289 +3,1068 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- SEO & Social Meta Tags -->
     <title>Feelsogood AI Builder School | 아이디어를 현실로</title>
-    <meta name="description" content="코딩 없이 AI 서비스를 직접 빌드하고 배포하는 가장 빠른 방법, Feelsogood AI 빌더 스쿨입니다.">
+    <meta name="description" content="코딩 몰라도 됩니다. 아이디어 하나로 AI 서비스를 직접 만들고 돈 버는 가장 빠른 방법.">
     <meta property="og:title" content="Feelsogood AI Builder School">
-    <meta property="og:description" content="아이디어를 AI 서비스로 만드는 퀀텀 점프 교육 서비스">
+    <meta property="og:description" content="퀄리티 있는 AI 앱을 4주 안에 직접 배포한 수강생들의 실제 이야기">
     <meta property="og:type" content="website">
-    
-    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- ============================================================
+    📧 EmailJS 설정 방법 (필수)
+    1. https://www.emailjs.com 회원가입 (무료 플랜: 월 200건)
+    2. Email Services → Gmail 연결
+    3. Email Templates → 새 템플릿 생성:
+       제목: [Feelsogood] 신규 수강 신청 - {{from_name}}
+       내용: 이름: {{from_name}} / 연락처: {{phone}} / 이메일: {{from_email}} / 과정: {{course}} / 아이디어: {{idea}}
+    4. Account → Public Key 복사
+    5. 아래 CONFIG 섹션에서 3가지 값을 교체하세요.
+    ============================================================ -->
+
+    <!-- ============================================================
+    🔐 관리자 모드 접근 방법
+    - 웹페이지에서 로고(F 아이콘)를 5번 클릭하면 관리자 로그인 창이 열립니다.
+    - 기본 비밀번호: feelsogood2026
+    - 아래 CONFIG에서 변경 가능합니다.
+    ============================================================ -->
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;800&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Pretendard:wght@300;400;600;800&display=swap');
+
         :root {
-            --quantum-green: #22c55e;
-            --quantum-blue: #3b82f6;
-            --deep-dark: #020617;
+            --green: #22c55e;
+            --blue: #3b82f6;
+            --dark: #020617;
+            --gold: #f59e0b;
         }
+
+        * { box-sizing: border-box; }
 
         body {
-            font-family: 'Pretendard', sans-serif;
-            background-color: var(--deep-dark);
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+            background-color: var(--dark);
             color: #f8fafc;
             scroll-behavior: smooth;
+            overflow-x: hidden;
         }
 
-        .gradient-border {
-            position: relative;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 24px;
-            z-index: 1;
+        h1, h2, h3 { font-family: 'Syne', 'Pretendard', sans-serif; }
+
+        /* ── Noise Overlay ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.6;
         }
 
-        .gradient-border::before {
-            content: "";
-            position: absolute;
-            inset: -1px;
-            background: linear-gradient(45deg, var(--quantum-green), transparent, var(--quantum-blue));
-            border-radius: 25px;
-            z-index: -1;
-            opacity: 0.3;
-        }
-
+        /* ── Glass Header ── */
         .glass-header {
-            background: rgba(2, 6, 23, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
 
+        /* ── Hero Glow ── */
         .hero-glow {
             position: absolute;
-            top: 20%;
+            top: -10%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60vw;
-            height: 60vw;
-            background: radial-gradient(circle, rgba(34, 197, 94, 0.1) 0%, transparent 70%);
-            filter: blur(60px);
+            transform: translateX(-50%);
+            width: 80vw;
+            height: 80vw;
+            max-width: 900px;
+            max-height: 900px;
+            background: radial-gradient(circle, rgba(34,197,94,0.12) 0%, rgba(59,130,246,0.06) 40%, transparent 70%);
+            filter: blur(80px);
+            pointer-events: none;
+        }
+
+        /* ── Marquee ── */
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .marquee-track { animation: marquee 24s linear infinite; white-space: nowrap; display: inline-flex; }
+
+        /* ── Float ── */
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .floating { animation: float 6s ease-in-out infinite; }
+
+        /* ── Pulse Ring ── */
+        @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
+        .pulse-ring::before {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            background: rgba(34,197,94,0.4);
+            animation: pulse-ring 2s ease-out infinite;
+        }
+
+        /* ── Gradient Border Cards ── */
+        .grad-border {
+            position: relative;
+            background: rgba(15,23,42,0.7);
+            border-radius: 28px;
+        }
+        .grad-border::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 29px;
+            background: linear-gradient(135deg, rgba(34,197,94,0.4), transparent 40%, rgba(59,130,246,0.3));
             z-index: -1;
         }
 
-        .nav-link {
-            transition: all 0.3s ease;
-            position: relative;
-        }
+        /* ── Countdown ── */
+        #countdown-bar { background: linear-gradient(90deg, #22c55e, #3b82f6); }
 
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--quantum-green);
-            transition: width 0.3s;
+        /* ── CTA Button ── */
+        .cta-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            box-shadow: 0 0 40px rgba(34,197,94,0.35), 0 4px 20px rgba(0,0,0,0.4);
+            transition: all 0.3s;
         }
-
-        .nav-link:hover::after {
-            width: 100%;
+        .cta-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 0 60px rgba(34,197,94,0.5), 0 8px 30px rgba(0,0,0,0.5);
         }
+        .cta-btn:active { transform: scale(0.98); }
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
+        /* ── Nav Link ── */
+        .nav-link { position: relative; transition: color 0.3s; }
+        .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: var(--green); transition: width 0.3s; }
+        .nav-link:hover::after { width: 100%; }
 
-        .floating {
-            animation: float 6s ease-in-out infinite;
-        }
+        /* ── Price Tag ── */
+        .price-old { text-decoration: line-through; color: #64748b; }
 
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--deep-dark); }
+        /* ── Admin Panel ── */
+        #adminPanel { display: none; }
+        #adminPanel.open { display: flex; }
+
+        /* ── Toast ── */
+        @keyframes slideUp { from { opacity:0; transform: translateX(-50%) translateY(20px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+        .toast-anim { animation: slideUp 0.4s ease; }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+        /* ── Table ── */
+        .admin-table th { background: rgba(34,197,94,0.1); color: #22c55e; padding: 10px 14px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; }
+        .admin-table td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+        .admin-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+        /* ── Stat Counter ── */
+        @keyframes countUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .stat-anim { animation: countUp 0.8s ease forwards; }
+
+        .selection\:bg-green-500\/30 *::selection { background: rgba(34,197,94,0.3); }
     </style>
 </head>
 <body class="selection:bg-green-500/30">
 
-    <header class="glass-header fixed top-0 w-full z-50">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-green-500/20">F</div>
-                <span class="text-xl font-extrabold tracking-tighter">Feelsogood <span class="text-green-500">^^</span></span>
-            </div>
-            
-            <nav class="hidden md:flex space-x-10 text-sm font-medium text-slate-400">
-                <a href="#programs" class="nav-link hover:text-white">프로그램</a>
-                <a href="#curriculum" class="nav-link hover:text-white">커리큘럼</a>
-                <a href="#community" class="nav-link hover:text-white">커뮤니티</a>
-                <a href="#faq" class="nav-link hover:text-white">FAQ</a>
-            </nav>
+<!-- ================================================================
+  CONFIG — 여기서 값만 바꾸면 됩니다
+================================================================ -->
+<script>
+const CONFIG = {
+    // EmailJS 설정 (emailjs.com 에서 발급)
+    emailjs: {
+        publicKey:  'YOUR_PUBLIC_KEY',     // ← Account > Public Key
+        serviceId:  'YOUR_SERVICE_ID',     // ← Email Services > Service ID
+        templateId: 'YOUR_TEMPLATE_ID',    // ← Email Templates > Template ID
+    },
+    // 관리자 비밀번호
+    adminPassword: 'feelsogood2026',
+    // 수신 이메일
+    adminEmail: 'imchaehun7@gmail.com',
+};
+</script>
 
-            <button onclick="openModal()" class="bg-white text-black px-6 py-2.5 rounded-full text-sm font-bold hover:bg-green-500 hover:text-white transition-all shadow-lg active:scale-95">
-                지금 시작하기
+<!-- ── 상단 긴급 배너 ── -->
+<div id="urgencyBar" class="relative overflow-hidden text-center py-3 px-4 text-xs font-bold tracking-wide" style="background:linear-gradient(90deg,#16a34a,#15803d,#166534,#15803d,#16a34a); background-size:200% 100%; animation: marquee 8s linear infinite;">
+    🔥 &nbsp; 2026년 상반기 마감 임박 — 잔여석 <span id="remainSeats">7</span>석 · 지금 신청하면 <strong>얼리버드 20% 할인</strong> 자동 적용 &nbsp; 🔥
+</div>
+
+<!-- ── Header ── -->
+<header class="glass-header fixed top-8 w-full z-50">
+    <div class="max-w-7xl mx-auto px-6 h-[68px] flex justify-between items-center">
+        <div id="logoClickArea" class="flex items-center space-x-2 cursor-pointer select-none" title="">
+            <div class="w-9 h-9 bg-green-500 rounded-xl flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-green-500/30">F</div>
+            <span class="text-xl font-extrabold tracking-tighter">Feelsogood <span class="text-green-500">^^</span></span>
+        </div>
+
+        <nav class="hidden md:flex space-x-10 text-sm font-medium text-slate-400">
+            <a href="#programs" class="nav-link hover:text-white">프로그램 & 가격</a>
+            <a href="#results" class="nav-link hover:text-white">수강 결과</a>
+            <a href="#curriculum" class="nav-link hover:text-white">커리큘럼</a>
+            <a href="#faq" class="nav-link hover:text-white">FAQ</a>
+        </nav>
+
+        <button onclick="openModal()" class="cta-btn text-white px-6 py-2.5 rounded-full text-sm font-bold">
+            지금 신청하기 →
+        </button>
+    </div>
+</header>
+
+<!-- ── Hero ── -->
+<section class="relative pt-52 pb-28 px-6 overflow-hidden">
+    <div class="hero-glow"></div>
+
+    <!-- 배경 grid 라인 -->
+    <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px); background-size: 60px 60px;"></div>
+
+    <div class="max-w-6xl mx-auto text-center space-y-10 relative z-10">
+
+        <div class="inline-flex items-center space-x-2 bg-slate-900/80 border border-green-500/20 px-5 py-2.5 rounded-full text-xs font-bold text-green-400 floating backdrop-blur">
+            <span class="relative pulse-ring flex h-2 w-2 mr-1">
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span>2026년 상반기 — 선착순 마감 진행 중</span>
+        </div>
+
+        <h1 class="text-5xl md:text-[80px] font-extrabold leading-[1.05] tracking-tight">
+            <span class="text-slate-300">당신의 아이디어,</span><br>
+            <span class="text-green-500">4주 안에</span> <span class="text-white">실제 서비스</span><br>
+            <span class="text-slate-300">로 만들어 드립니다.</span>
+        </h1>
+
+        <p class="max-w-2xl mx-auto text-slate-400 text-lg md:text-xl leading-relaxed">
+            코딩 경험 <strong class="text-white">0년</strong>도 괜찮습니다.<br>
+            비즈니스 설계 → AI 모델 연동 → 실 사용자 배포까지<br>
+            <strong class="text-green-400">단 하나의 커리큘럼</strong>으로 완성합니다.
+        </p>
+
+        <!-- 실시간 카운터 -->
+        <div class="flex flex-wrap items-center justify-center gap-6 md:gap-12 py-2">
+            <div class="text-center">
+                <div class="text-4xl font-extrabold text-green-400" data-target="312">0</div>
+                <div class="text-xs text-slate-500 mt-1 uppercase tracking-widest">총 수강생</div>
+            </div>
+            <div class="w-px h-12 bg-slate-800 hidden md:block"></div>
+            <div class="text-center">
+                <div class="text-4xl font-extrabold text-blue-400" data-target="89">0</div>
+                <div class="text-xs text-slate-500 mt-1 uppercase tracking-widest">완성 프로젝트</div>
+            </div>
+            <div class="w-px h-12 bg-slate-800 hidden md:block"></div>
+            <div class="text-center">
+                <div class="text-4xl font-extrabold text-amber-400" data-target="96">0</div>
+                <div class="text-xs text-slate-500 mt-1 uppercase tracking-widest">만족도 %</div>
+            </div>
+            <div class="w-px h-12 bg-slate-800 hidden md:block"></div>
+            <div class="text-center">
+                <div class="text-4xl font-extrabold text-pink-400" data-target="24">0</div>
+                <div class="text-xs text-slate-500 mt-1 uppercase tracking-widest">창업 성공 사례</div>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center justify-center gap-4 pt-4">
+            <button onclick="openModal()" class="cta-btn w-full md:w-auto text-white px-12 py-5 rounded-2xl text-xl font-extrabold">
+                지금 바로 신청하기 🚀
+            </button>
+            <a href="#programs" class="w-full md:w-auto bg-slate-800/80 hover:bg-slate-700 backdrop-blur border border-slate-700 px-12 py-5 rounded-2xl text-xl font-extrabold transition-all text-center">
+                가격 & 커리큘럼 확인 →
+            </a>
+        </div>
+
+        <p class="text-slate-600 text-sm">💳 분할 납부 가능 · 환불 정책 안내 · 할부 최대 12개월</p>
+    </div>
+</section>
+
+<!-- ── Marquee Tech Stack ── -->
+<div class="border-y border-slate-900 py-5 overflow-hidden bg-slate-950/60">
+    <div class="marquee-track gap-16 items-center">
+        <span class="text-slate-500 text-sm font-bold px-6">🤖 OpenAI GPT-4o</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🧠 Anthropic Claude</span>
+        <span class="text-slate-500 text-sm font-bold px-6">⚡ Next.js 14</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🎨 TailwindCSS</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🗄️ Supabase</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🚀 Vercel</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🔧 Cursor AI</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🌐 Stripe 결제</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🤖 OpenAI GPT-4o</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🧠 Anthropic Claude</span>
+        <span class="text-slate-500 text-sm font-bold px-6">⚡ Next.js 14</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🎨 TailwindCSS</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🗄️ Supabase</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🚀 Vercel</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🔧 Cursor AI</span>
+        <span class="text-slate-500 text-sm font-bold px-6">🌐 Stripe 결제</span>
+    </div>
+</div>
+
+<!-- ── Pain Points ── -->
+<section class="py-24 px-6 max-w-5xl mx-auto">
+    <div class="text-center mb-16 space-y-3">
+        <p class="text-green-500 text-sm font-bold uppercase tracking-widest">혹시 이런 경험 있으신가요?</p>
+        <h2 class="text-4xl md:text-5xl font-extrabold">이 중 하나라도 해당된다면,<br><span class="text-green-500">지금이 바로 그 때입니다.</span></h2>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4">
+        <div class="grad-border p-7 flex items-start gap-4">
+            <span class="text-3xl">😩</span>
+            <div>
+                <p class="font-bold mb-1">아이디어는 있는데 개발자 섭외가 너무 힘들어요</p>
+                <p class="text-slate-500 text-sm">외주 견적 500만원? 6개월 대기? 그럴 필요 없습니다. 직접 만드세요.</p>
+            </div>
+        </div>
+        <div class="grad-border p-7 flex items-start gap-4">
+            <span class="text-3xl">📚</span>
+            <div>
+                <p class="font-bold mb-1">유튜브, 강의만 보는데 실제로 만들어본 게 없어요</p>
+                <p class="text-slate-500 text-sm">지식이 쌓여도 실행이 없으면 아무것도 달라지지 않습니다.</p>
+            </div>
+        </div>
+        <div class="grad-border p-7 flex items-start gap-4">
+            <span class="text-3xl">💼</span>
+            <div>
+                <p class="font-bold mb-1">직장에서 AI 툴 만들어야 하는데 어디서부터 시작할지 모르겠어요</p>
+                <p class="text-slate-500 text-sm">현직자가 가장 많이 찾는 과정입니다. 실무에 바로 적용됩니다.</p>
+            </div>
+        </div>
+        <div class="grad-border p-7 flex items-start gap-4">
+            <span class="text-3xl">🚀</span>
+            <div>
+                <p class="font-bold mb-1">창업 아이템이 있는데 MVP를 어떻게 만들어야 할지 모르겠어요</p>
+                <p class="text-slate-500 text-sm">투자자들이 요구하는 MVP, 4주 안에 실제로 완성합니다.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Programs & Pricing ── -->
+<section id="programs" class="py-24 px-6 max-w-7xl mx-auto">
+    <div class="text-center space-y-4 mb-16">
+        <p class="text-green-500 text-sm font-bold uppercase tracking-widest">투명한 가격 정책</p>
+        <h2 class="text-4xl md:text-5xl font-extrabold">당신의 목표에 맞는 과정을 선택하세요</h2>
+        <p class="text-slate-400">모든 과정은 <strong class="text-white">실전 프로젝트 포함</strong> · 수료 후 커뮤니티 영구 가입</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8 items-stretch">
+
+        <!-- Card 1 -->
+        <div class="grad-border p-8 flex flex-col hover:scale-[1.02] transition-transform duration-300">
+            <div class="w-14 h-14 bg-green-500/10 rounded-2xl flex items-center justify-center mb-6">
+                <i data-lucide="zap" class="text-green-500 w-7 h-7"></i>
+            </div>
+            <p class="text-xs font-bold text-green-500 uppercase tracking-widest mb-2">단기 집중</p>
+            <h3 class="text-2xl font-extrabold mb-3">3-Day Warp</h3>
+            <p class="text-slate-400 text-sm mb-6 leading-relaxed flex-1">주말 3일 안에 아이디어를 실제로 배포 가능한 웹앱으로 만드는 초집중 워크숍. 코딩 경험 없어도 OK.</p>
+
+            <div class="mb-6 p-5 bg-slate-900/60 rounded-2xl">
+                <div class="flex items-baseline gap-2 mb-1">
+                    <span class="price-old text-sm">₩612,000</span>
+                    <span class="text-xs text-green-400 font-bold bg-green-500/10 px-2 py-0.5 rounded-full">얼리버드 20% ↓</span>
+                </div>
+                <div class="text-4xl font-extrabold text-white">₩490,000</div>
+                <div class="text-slate-500 text-xs mt-1">VAT 포함 · 2회 분할 가능</div>
+            </div>
+
+            <ul class="space-y-3 text-sm text-slate-300 mb-8">
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0"></i> AI 프롬프트 설계 마스터</li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0"></i> 노코드 웹 빌더 활용 (Cursor + Vercel)</li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0"></i> 실전 도메인 배포 실습</li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0"></i> 수료 후 커뮤니티 영구 참여</li>
+                <li class="flex items-start gap-2"><i data-lucide="x-circle" class="w-4 h-4 mt-0.5 text-slate-600 flex-shrink-0"></i> <span class="text-slate-600">1:1 코드 리뷰 제외</span></li>
+            </ul>
+            <button onclick="openModal('3-Day Warp')" class="mt-auto w-full py-4 bg-slate-800 hover:bg-green-500 rounded-2xl font-bold transition-all duration-200">
+                지금 신청하기 →
             </button>
         </div>
-    </header>
 
-    <section class="relative pt-40 pb-20 px-6 overflow-hidden">
-        <div class="hero-glow"></div>
-        <div class="max-w-7xl mx-auto text-center space-y-8">
-            <div class="inline-flex items-center space-x-2 bg-slate-900 border border-slate-800 px-4 py-2 rounded-full text-xs font-semibold text-green-400 floating">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                <span>2026년 상반기 신규 수강생 모집 중</span>
-            </div>
-            
-            <h1 class="text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight">
-                아이디어를 <span class="text-green-500">AI 서비스</span>로<br>
-                직접 배포하는 가장 빠른 방법
-            </h1>
-            
-            <p class="max-w-2xl mx-auto text-slate-400 text-lg md:text-xl font-light leading-relaxed">
-                복잡한 코딩 이론은 건너뜁니다. <br>
-                비즈니스 설계부터 AI 모델 연동, 배포까지 퀀텀 점프를 경험하세요.
-            </p>
+        <!-- Card 2 — Popular -->
+        <div class="relative p-8 flex flex-col rounded-[28px] md:-translate-y-6" style="background: linear-gradient(160deg, rgba(20,40,25,0.95), rgba(15,23,42,0.95)); border: 2px solid #22c55e; box-shadow: 0 0 60px rgba(34,197,94,0.15);">
+            <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-green-500 text-white px-5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-widest shadow-lg">🏆 가장 많이 선택</div>
 
-            <div class="flex flex-col md:flex-row items-center justify-center gap-4 pt-4">
-                <button onclick="openModal()" class="w-full md:w-auto bg-green-500 hover:bg-green-600 px-10 py-5 rounded-2xl text-lg font-bold shadow-xl shadow-green-500/20 transition-all">
-                    무료 오리엔테이션 신청
-                </button>
-                <a href="#programs" class="w-full md:w-auto bg-slate-800 hover:bg-slate-700 px-10 py-5 rounded-2xl text-lg font-bold transition-all">
-                    커리큘럼 보기
-                </a>
+            <div class="w-14 h-14 bg-green-500/20 rounded-2xl flex items-center justify-center mb-6">
+                <i data-lucide="flame" class="text-green-500 w-7 h-7"></i>
             </div>
+            <p class="text-xs font-bold text-green-400 uppercase tracking-widest mb-2">정규 과정</p>
+            <h3 class="text-2xl font-extrabold mb-3">4-Week Boot</h3>
+            <p class="text-slate-300 text-sm mb-6 leading-relaxed flex-1">비즈니스 모델부터 AI 기능 구현·결제 연동·마케팅 자동화까지. 실제 수익화가 가능한 완성형 서비스를 빌드합니다.</p>
+
+            <div class="mb-6 p-5 bg-black/30 rounded-2xl border border-green-500/20">
+                <div class="flex items-baseline gap-2 mb-1">
+                    <span class="price-old text-sm">₩1,860,000</span>
+                    <span class="text-xs text-green-400 font-bold bg-green-500/10 px-2 py-0.5 rounded-full">얼리버드 20% ↓</span>
+                </div>
+                <div class="text-4xl font-extrabold text-green-400">₩1,490,000</div>
+                <div class="text-slate-500 text-xs mt-1">VAT 포함 · 최대 12개월 할부</div>
+            </div>
+
+            <ul class="space-y-3 text-sm text-slate-200 mb-8">
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0"></i> <strong>3-Day Warp 전체 내용 포함</strong></li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0"></i> 데이터베이스 설계 (Supabase)</li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0"></i> 사용자 인증 & 결제 시스템 구축</li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0"></i> AI API 연동 심화 (GPT-4o + Claude)</li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0"></i> 1:1 코드 리뷰 4회</li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0"></i> 수익화 전략 & SEO 셋업</li>
+            </ul>
+            <button onclick="openModal('4-Week Boot')" class="mt-auto w-full py-4 bg-green-500 hover:bg-green-400 rounded-2xl font-extrabold text-white text-lg shadow-xl shadow-green-500/20 transition-all">
+                지금 신청하기 🚀
+            </button>
         </div>
-    </section>
 
-    <!-- Partners / Tech Stack -->
-    <section class="py-10 border-y border-slate-900 bg-slate-950/50">
-        <div class="max-w-7xl mx-auto px-6 overflow-hidden">
-            <p class="text-center text-xs font-semibold text-slate-500 uppercase tracking-[0.2em] mb-8">배우게 될 핵심 기술 스택</p>
-            <div class="flex flex-wrap justify-center gap-8 md:gap-16 opacity-40 grayscale hover:grayscale-0 transition-all">
-                <span class="text-xl font-bold">OpenAI</span>
-                <span class="text-xl font-bold">Anthropic</span>
-                <span class="text-xl font-bold">TailwindCSS</span>
-                <span class="text-xl font-bold">Next.js</span>
-                <span class="text-xl font-bold">Supabase</span>
-                <span class="text-xl font-bold">Vercel</span>
+        <!-- Card 3 -->
+        <div class="grad-border p-8 flex flex-col hover:scale-[1.02] transition-transform duration-300" style="--glow: rgba(59,130,246,0.3);">
+            <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6">
+                <i data-lucide="crown" class="text-blue-500 w-7 h-7"></i>
             </div>
-        </div>
-    </section>
+            <p class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2">예비 창업자 전용</p>
+            <h3 class="text-2xl font-extrabold mb-3">Startup Lab</h3>
+            <p class="text-slate-400 text-sm mb-6 leading-relaxed flex-1">1:1 맞춤형 컨설팅으로 PMF 검증부터 투자 유치 네트워크까지. 진짜 창업을 준비하는 분들을 위한 프리미엄 과정.</p>
 
-    <section id="programs" class="py-24 px-6 max-w-7xl mx-auto">
+            <div class="mb-6 p-5 bg-slate-900/60 rounded-2xl">
+                <div class="flex items-baseline gap-2 mb-1">
+                    <span class="price-old text-sm">₩4,880,000</span>
+                    <span class="text-xs text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded-full">얼리버드 20% ↓</span>
+                </div>
+                <div class="text-4xl font-extrabold text-blue-400">₩3,900,000</div>
+                <div class="text-slate-500 text-xs mt-1">VAT 포함 · 분할 납부 별도 상담</div>
+            </div>
+
+            <ul class="space-y-3 text-sm text-slate-300 mb-8">
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-blue-500 flex-shrink-0"></i> <strong>4-Week Boot 전체 내용 포함</strong></li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-blue-500 flex-shrink-0"></i> 1:1 멘토링 주 2회 (8주)</li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-blue-500 flex-shrink-0"></i> PMF 검증 & 인터뷰 설계</li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-blue-500 flex-shrink-0"></i> 피칭 덱 스토리텔링 코칭</li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-blue-500 flex-shrink-0"></i> 투자사 네트워크 연결 지원</li>
+                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 mt-0.5 text-blue-500 flex-shrink-0"></i> 데모데이 발표 기회</li>
+            </ul>
+            <button onclick="openModal('Startup Lab')" class="mt-auto w-full py-4 bg-slate-800 hover:bg-blue-500 rounded-2xl font-bold transition-all duration-200">
+                상담 신청하기 →
+            </button>
+        </div>
+
+    </div>
+
+    <!-- 환불 보장 -->
+    <div class="mt-12 text-center p-6 bg-slate-900/40 border border-slate-800 rounded-3xl max-w-2xl mx-auto">
+        <p class="text-lg font-bold mb-1">🛡️ 7일 전액 환불 보장</p>
+        <p class="text-slate-400 text-sm">수강 시작 후 7일 이내, 어떤 이유로도 전액 환불 가능합니다. 만족하지 못하면 한 푼도 받지 않겠습니다.</p>
+    </div>
+</section>
+
+<!-- ── Social Proof / Results ── -->
+<section id="results" class="py-24 px-6 bg-slate-950/50">
+    <div class="max-w-7xl mx-auto">
         <div class="text-center space-y-4 mb-16">
-            <h2 class="text-4xl font-bold">맞춤형 빌더 코스</h2>
-            <p class="text-slate-400">당신의 속도와 목표에 맞는 과정을 선택하세요.</p>
+            <p class="text-green-500 text-sm font-bold uppercase tracking-widest">실제 수강생 이야기</p>
+            <h2 class="text-4xl md:text-5xl font-extrabold">수강 후 이렇게 달라졌습니다</h2>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="p-8 bg-slate-900 border border-slate-800 rounded-[32px] hover:border-green-500/50 transition-all group">
-                <div class="w-14 h-14 bg-green-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <i data-lucide="zap" class="text-green-500"></i>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="grad-border p-8">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-xl font-bold text-green-400">김</div>
+                    <div>
+                        <p class="font-bold">김민준</p>
+                        <p class="text-slate-500 text-xs">마케터 → AI 서비스 창업 · 4-Week Boot</p>
+                    </div>
                 </div>
-                <h3 class="text-2xl font-bold mb-4">3-Day Warp</h3>
-                <p class="text-slate-400 text-sm mb-8 leading-relaxed">아이디어를 웹으로 구현하는 핵심 기술만 압축하여 전수하는 단기 집중 워크숍입니다.</p>
-                <ul class="space-y-3 text-sm text-slate-300 mb-8">
-                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i> AI 프롬프트 설계</li>
-                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i> 노코드 웹 빌더 활용</li>
-                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i> 실전 도메인 배포</li>
-                </ul>
-                <button onclick="openModal()" class="w-full py-4 bg-slate-800 rounded-2xl font-bold hover:bg-green-500 transition-colors">자세히 보기</button>
+                <div class="flex text-yellow-400 text-sm mb-3">★★★★★</div>
+                <p class="text-slate-300 text-sm leading-relaxed">"코딩을 배운 게 아니라 <strong class="text-white">제품을 만드는 법</strong>을 배웠어요. 수강 끝나고 3주 뒤에 첫 유료 고객이 생겼습니다."</p>
             </div>
-
-            <div class="p-8 bg-slate-900 border-2 border-green-500 rounded-[32px] relative transform md:-translate-y-4 shadow-2xl shadow-green-500/10">
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase">가장 많이 선택함</div>
-                <div class="w-14 h-14 bg-green-500/10 rounded-2xl flex items-center justify-center mb-6">
-                    <i data-lucide="flame" class="text-green-500"></i>
+            <div class="grad-border p-8">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-xl font-bold text-blue-400">이</div>
+                    <div>
+                        <p class="font-bold">이수현</p>
+                        <p class="text-slate-500 text-xs">기획자 · Startup Lab</p>
+                    </div>
                 </div>
-                <h3 class="text-2xl font-bold mb-4">4-Week Boot</h3>
-                <p class="text-slate-400 text-sm mb-8 leading-relaxed">비즈니스 모델링부터 고도화된 AI 기능 구현까지, 실제 수익화가 가능한 수준의 앱을 빌드합니다.</p>
-                <ul class="space-y-3 text-sm text-slate-300 mb-8">
-                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i> 데이터베이스 설계</li>
-                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i> 사용자 인증 & 보안</li>
-                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i> AI 연동 심화 실습</li>
-                </ul>
-                <button onclick="openModal()" class="w-full py-4 bg-green-500 rounded-2xl font-bold text-white shadow-lg">신청하기</button>
+                <div class="flex text-yellow-400 text-sm mb-3">★★★★★</div>
+                <p class="text-slate-300 text-sm leading-relaxed">"MVP를 들고 투자 미팅에 갔더니 실제 작동하는 걸 보고 다들 놀랐어요. <strong class="text-white">시드 투자 1.5억</strong>을 유치했습니다."</p>
             </div>
-
-            <div class="p-8 bg-slate-900 border border-slate-800 rounded-[32px] hover:border-blue-500/50 transition-all group">
-                <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <i data-lucide="crown" class="text-blue-500"></i>
+            <div class="grad-border p-8">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-xl font-bold text-amber-400">박</div>
+                    <div>
+                        <p class="font-bold">박지혜</p>
+                        <p class="text-slate-500 text-xs">직장인 · 3-Day Warp</p>
+                    </div>
                 </div>
-                <h3 class="text-2xl font-bold mb-4">Startup Lab</h3>
-                <p class="text-slate-400 text-sm mb-8 leading-relaxed">예비 창업자를 위한 1:1 맞춤형 컨설팅 및 MVP(최소 기능 제품) 제작 가속 과정입니다.</p>
-                <ul class="space-y-3 text-sm text-slate-300 mb-8">
-                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-blue-500"></i> 마켓 핏(PMF) 검증</li>
-                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-blue-500"></i> 피칭 덱 스토리텔링</li>
-                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-blue-500"></i> 투자 유치 네트워크</li>
-                </ul>
-                <button onclick="openModal()" class="w-full py-4 bg-slate-800 rounded-2xl font-bold hover:bg-blue-500 transition-colors">상담 신청</button>
+                <div class="flex text-yellow-400 text-sm mb-3">★★★★★</div>
+                <p class="text-slate-300 text-sm leading-relaxed">"주말 3일인데 월요일에 팀장님한테 <strong class="text-white">내부 AI 툴을 바로 납품</strong>했어요. 팀에서 완전히 다른 포지션이 됐습니다."</p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <footer class="py-20 px-6 border-t border-slate-900">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-            <div class="text-center md:text-left">
-                <div class="text-2xl font-extrabold mb-2">Feelsogood ^^</div>
-                <p class="text-slate-500 text-sm">AI Builder School - 아이디어를 현실로 만드는 공간</p>
-            </div>
-            <div class="flex space-x-6 text-slate-400">
-                <a href="#" class="hover:text-white"><i data-lucide="instagram"></i></a>
-                <a href="#" class="hover:text-white"><i data-lucide="youtube"></i></a>
-                <a href="#" class="hover:text-white"><i data-lucide="github"></i></a>
-                <a href="#" class="hover:text-white"><i data-lucide="mail"></i></a>
-            </div>
-            <div class="text-slate-500 text-xs text-center md:text-right">
-                © 2026 Feelsogood AI. All rights reserved. <br>
-                서울특별시 강남구 테헤란로 (AI 빌더 타워)
+<!-- ── Curriculum ── -->
+<section id="curriculum" class="py-24 px-6 max-w-5xl mx-auto">
+    <div class="text-center space-y-4 mb-16">
+        <p class="text-green-500 text-sm font-bold uppercase tracking-widest">4-Week Boot 기준</p>
+        <h2 class="text-4xl md:text-5xl font-extrabold">4주 안에 벌어지는 일들</h2>
+    </div>
+
+    <div class="space-y-4">
+        <div class="grad-border p-7 flex gap-6 items-start">
+            <div class="w-12 h-12 bg-green-500/20 rounded-2xl flex items-center justify-center flex-shrink-0 font-extrabold text-green-400">W1</div>
+            <div>
+                <h4 class="font-extrabold text-lg mb-1">기초 & AI 프롬프트 엔지니어링</h4>
+                <p class="text-slate-400 text-sm leading-relaxed">환경 셋업 · GPT-4o / Claude API 기초 · 프롬프트 최적화 기법 · 첫 AI 채팅앱 배포</p>
             </div>
         </div>
-    </footer>
+        <div class="grad-border p-7 flex gap-6 items-start">
+            <div class="w-12 h-12 bg-green-500/20 rounded-2xl flex items-center justify-center flex-shrink-0 font-extrabold text-green-400">W2</div>
+            <div>
+                <h4 class="font-extrabold text-lg mb-1">풀스택 앱 구조 설계</h4>
+                <p class="text-slate-400 text-sm leading-relaxed">Next.js 라우팅 · Supabase 데이터베이스 · 사용자 인증(OAuth) · 미들웨어 & 보안</p>
+            </div>
+        </div>
+        <div class="grad-border p-7 flex gap-6 items-start">
+            <div class="w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center flex-shrink-0 font-extrabold text-blue-400">W3</div>
+            <div>
+                <h4 class="font-extrabold text-lg mb-1">AI 기능 고도화 & 결제 연동</h4>
+                <p class="text-slate-400 text-sm leading-relaxed">RAG 파이프라인 · 벡터 DB · Stripe 결제 · 구독 모델 구현 · 이미지 생성 API</p>
+            </div>
+        </div>
+        <div class="grad-border p-7 flex gap-6 items-start">
+            <div class="w-12 h-12 bg-amber-500/20 rounded-2xl flex items-center justify-center flex-shrink-0 font-extrabold text-amber-400">W4</div>
+            <div>
+                <h4 class="font-extrabold text-lg mb-1">배포 · 마케팅 자동화 · 수익화</h4>
+                <p class="text-slate-400 text-sm leading-relaxed">성능 최적화 · SEO · 소셜 미디어 자동화 · 분석 셋업 · <strong class="text-white">최종 프로젝트 데모데이</strong></p>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <div id="applyModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6">
-        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeModal()"></div>
-        <div class="relative bg-slate-900 w-full max-w-xl p-10 rounded-[40px] border border-slate-700 shadow-2xl">
-            <button onclick="closeModal()" class="absolute top-6 right-6 p-2 text-slate-400 hover:text-white">
-                <i data-lucide="x"></i>
+<!-- ── FAQ ── -->
+<section id="faq" class="py-24 px-6 max-w-3xl mx-auto">
+    <div class="text-center space-y-4 mb-16">
+        <h2 class="text-4xl font-extrabold">자주 묻는 질문</h2>
+    </div>
+    <div class="space-y-3" id="faqList">
+        <div class="faq-item grad-border overflow-hidden">
+            <button class="faq-btn w-full p-6 text-left font-bold flex justify-between items-center" onclick="toggleFaq(this)">
+                <span>코딩 경험이 전혀 없는데 들을 수 있나요?</span>
+                <i data-lucide="chevron-down" class="w-5 h-5 text-green-500 transition-transform flex-shrink-0"></i>
             </button>
-            
-            <div class="text-center mb-8">
-                <h3 class="text-3xl font-bold mb-2">시작을 위한 한 걸음</h3>
-                <p class="text-slate-400">현재 수강 대기 인원이 많습니다. <br>간단한 정보를 남겨주시면 우선적으로 안내드립니다.</p>
+            <div class="faq-body hidden px-6 pb-6 text-slate-400 text-sm leading-relaxed">
+                네, 가능합니다. 수강생의 약 60%가 코딩 비전공자입니다. 모든 커리큘럼은 "작동하는 것을 먼저 만든다"는 원칙으로 설계되어 있어, 개념보다 실전 흐름을 따라가며 자연스럽게 체득하게 됩니다.
             </div>
+        </div>
+        <div class="faq-item grad-border overflow-hidden">
+            <button class="faq-btn w-full p-6 text-left font-bold flex justify-between items-center" onclick="toggleFaq(this)">
+                <span>수업은 어떤 방식으로 진행되나요?</span>
+                <i data-lucide="chevron-down" class="w-5 h-5 text-green-500 transition-transform flex-shrink-0"></i>
+            </button>
+            <div class="faq-body hidden px-6 pb-6 text-slate-400 text-sm leading-relaxed">
+                모든 수업은 라이브 온라인으로 진행됩니다. 녹화본은 수강 기간 내 무제한 재시청 가능합니다. 오프라인 집중 세션은 서울 강남 스튜디오에서 월 1회 선택 참여 가능합니다.
+            </div>
+        </div>
+        <div class="faq-item grad-border overflow-hidden">
+            <button class="faq-btn w-full p-6 text-left font-bold flex justify-between items-center" onclick="toggleFaq(this)">
+                <span>얼리버드 할인은 언제까지 적용되나요?</span>
+                <i data-lucide="chevron-down" class="w-5 h-5 text-green-500 transition-transform flex-shrink-0"></i>
+            </button>
+            <div class="faq-body hidden px-6 pb-6 text-slate-400 text-sm leading-relaxed">
+                잔여석이 마감되면 즉시 정가로 전환됩니다. 현재 잔여석이 매우 적으니, 신청 후 자동 적용되는 20% 할인을 놓치지 마세요.
+            </div>
+        </div>
+        <div class="faq-item grad-border overflow-hidden">
+            <button class="faq-btn w-full p-6 text-left font-bold flex justify-between items-center" onclick="toggleFaq(this)">
+                <span>환불 정책은 어떻게 되나요?</span>
+                <i data-lucide="chevron-down" class="w-5 h-5 text-green-500 transition-transform flex-shrink-0"></i>
+            </button>
+            <div class="faq-body hidden px-6 pb-6 text-slate-400 text-sm leading-relaxed">
+                수강 시작 후 7일 이내에는 어떤 이유로도 전액 환불이 가능합니다. 7일 이후에는 진행률에 따른 비례 환불 정책이 적용됩니다. 자세한 사항은 상담 시 안내드립니다.
+            </div>
+        </div>
+        <div class="faq-item grad-border overflow-hidden">
+            <button class="faq-btn w-full p-6 text-left font-bold flex justify-between items-center" onclick="toggleFaq(this)">
+                <span>분할 납부가 가능한가요?</span>
+                <i data-lucide="chevron-down" class="w-5 h-5 text-green-500 transition-transform flex-shrink-0"></i>
+            </button>
+            <div class="faq-body hidden px-6 pb-6 text-slate-400 text-sm leading-relaxed">
+                신용카드 기준 3·6·12개월 무이자 할부가 가능합니다. 법인카드, 체크카드 등 다양한 결제 수단을 지원합니다. 분할 납부 신청 시 상담을 통해 안내드립니다.
+            </div>
+        </div>
+    </div>
+</section>
 
-            <form class="space-y-4" onsubmit="handleApply(event)">
-                <div class="grid md:grid-cols-2 gap-4">
-                    <input type="text" required placeholder="성함" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-green-500 outline-none text-white">
-                    <input type="tel" required placeholder="연락처" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-green-500 outline-none text-white">
+<!-- ── Final CTA ── -->
+<section class="py-28 px-6 relative overflow-hidden">
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, rgba(34,197,94,0.08) 0%, transparent 70%);"></div>
+    <div class="max-w-3xl mx-auto text-center space-y-8 relative z-10">
+        <p class="text-green-500 text-sm font-bold uppercase tracking-widest">마지막 기회</p>
+        <h2 class="text-4xl md:text-6xl font-extrabold leading-tight">
+            1년 뒤의 나는<br>
+            <span class="text-green-500">만들어본 사람</span>이 될까요,<br>
+            <span class="text-slate-500">고민만 한 사람</span>이 될까요?
+        </h2>
+        <p class="text-slate-400 text-lg">신청 후 24시간 내 담당자가 직접 연락드립니다.</p>
+        <button onclick="openModal()" class="cta-btn inline-block text-white px-16 py-6 rounded-2xl text-xl font-extrabold">
+            지금 당장 시작하기 🔥
+        </button>
+        <p class="text-slate-600 text-sm">잔여석 <span id="remainSeats2" class="text-red-400 font-bold">7</span>석 · 오늘 마감 가능</p>
+    </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer class="py-16 px-6 border-t border-slate-900">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+        <div>
+            <div class="text-2xl font-extrabold mb-1">Feelsogood ^^</div>
+            <p class="text-slate-500 text-sm">AI Builder School — 아이디어를 현실로 만드는 공간</p>
+        </div>
+        <div class="flex space-x-6 text-slate-400">
+            <a href="#" class="hover:text-white transition-colors"><i data-lucide="instagram"></i></a>
+            <a href="#" class="hover:text-white transition-colors"><i data-lucide="youtube"></i></a>
+            <a href="#" class="hover:text-white transition-colors"><i data-lucide="github"></i></a>
+            <a href="#" class="hover:text-white transition-colors"><i data-lucide="mail"></i></a>
+        </div>
+        <div class="text-slate-600 text-xs text-center md:text-right">
+            © 2026 Feelsogood AI. All rights reserved.<br>
+            서울특별시 강남구 테헤란로 (AI 빌더 타워)<br>
+            사업자등록번호: 000-00-00000
+        </div>
+    </div>
+</footer>
+
+<!-- ================================================================
+  신청 모달
+================================================================ -->
+<div id="applyModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-6">
+    <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" onclick="closeModal()"></div>
+    <div class="relative bg-slate-900 w-full max-w-xl p-10 rounded-[40px] border border-slate-700 shadow-2xl overflow-y-auto max-h-[90vh]">
+        <button onclick="closeModal()" class="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition-colors">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <div class="text-center mb-8">
+            <div class="text-4xl mb-3">🚀</div>
+            <h3 class="text-3xl font-extrabold mb-2">시작을 위한 한 걸음</h3>
+            <p class="text-slate-400 text-sm">정보 입력 후 <strong class="text-white">24시간 이내</strong> 담당자가 연락드립니다.<br>
+            <span class="text-green-400 font-bold">얼리버드 할인은 자동 적용</span>됩니다.</p>
+        </div>
+
+        <form id="applyForm" class="space-y-4" onsubmit="handleApply(event)">
+            <div class="grid md:grid-cols-2 gap-4">
+                <input type="text" id="f_name" required placeholder="성함 *" class="w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-green-500 outline-none text-white placeholder-slate-500">
+                <input type="tel" id="f_phone" required placeholder="연락처 * (예: 010-1234-5678)" class="w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-green-500 outline-none text-white placeholder-slate-500">
+            </div>
+            <input type="email" id="f_email" required placeholder="이메일 주소 *" class="w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-green-500 outline-none text-white placeholder-slate-500">
+            <select id="f_course" class="w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-green-500 outline-none text-white appearance-none">
+                <option value="">관심 과정을 선택하세요 *</option>
+                <option value="3-Day Warp (₩490,000)">3-Day Warp — ₩490,000 (얼리버드)</option>
+                <option value="4-Week Boot (₩1,490,000)">4-Week Boot — ₩1,490,000 (얼리버드)</option>
+                <option value="Startup Lab (₩3,900,000)">Startup Lab — ₩3,900,000 (얼리버드)</option>
+            </select>
+            <select id="f_level" class="w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-green-500 outline-none text-white appearance-none">
+                <option value="">코딩 경험 수준</option>
+                <option value="없음">전혀 없음</option>
+                <option value="약간">HTML/CSS 정도</option>
+                <option value="중급">JS 가능</option>
+                <option value="고급">풀스택 개발 가능</option>
+            </select>
+            <textarea id="f_idea" rows="3" placeholder="구현하고 싶은 AI 아이디어가 있나요? (선택)" class="w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-green-500 outline-none text-white resize-none placeholder-slate-500"></textarea>
+
+            <div id="formError" class="hidden text-red-400 text-sm text-center p-3 bg-red-500/10 rounded-xl"></div>
+
+            <button type="submit" id="submitBtn" class="cta-btn w-full text-white font-extrabold py-5 rounded-2xl text-lg mt-2">
+                <span id="submitText">상담 신청 및 자료 받기 →</span>
+                <span id="submitLoading" class="hidden">전송 중...</span>
+            </button>
+            <p class="text-center text-slate-600 text-xs">개인정보는 상담 목적으로만 사용되며, 제3자에게 제공되지 않습니다.</p>
+        </form>
+    </div>
+</div>
+
+<!-- ================================================================
+  관리자 로그인 모달
+================================================================ -->
+<div id="adminLoginModal" class="fixed inset-0 z-[200] hidden items-center justify-center p-6">
+    <div class="absolute inset-0 bg-black/95 backdrop-blur-xl" onclick="closeAdminLogin()"></div>
+    <div class="relative bg-slate-900 w-full max-w-sm p-10 rounded-[32px] border border-slate-700 shadow-2xl">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="shield" class="text-green-500 w-8 h-8"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold mb-1">관리자 로그인</h3>
+            <p class="text-slate-500 text-sm">관리자 비밀번호를 입력하세요</p>
+        </div>
+        <input type="password" id="adminPwInput" placeholder="비밀번호" class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-green-500 outline-none text-white mb-4 text-center tracking-widest text-lg" onkeydown="if(event.key==='Enter') checkAdminPw()">
+        <div id="adminPwError" class="hidden text-red-400 text-sm text-center mb-3">❌ 비밀번호가 틀렸습니다.</div>
+        <button onclick="checkAdminPw()" class="w-full bg-green-500 hover:bg-green-400 text-white font-bold py-4 rounded-2xl transition-all">
+            로그인
+        </button>
+        <button onclick="closeAdminLogin()" class="w-full mt-3 text-slate-500 hover:text-white text-sm py-2 transition-colors">취소</button>
+    </div>
+</div>
+
+<!-- ================================================================
+  관리자 패널
+================================================================ -->
+<div id="adminPanel" class="fixed inset-0 z-[300] items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/98 backdrop-blur-2xl"></div>
+    <div class="relative w-full max-w-7xl bg-slate-900 rounded-[32px] border border-slate-700 shadow-2xl overflow-hidden flex flex-col" style="max-height: 95vh;">
+
+        <!-- 헤더 -->
+        <div class="flex items-center justify-between p-6 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
+                    <i data-lucide="layout-dashboard" class="text-green-500 w-5 h-5"></i>
                 </div>
-                <input type="email" required placeholder="이메일 주소" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-green-500 outline-none text-white">
-                <select class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-green-500 outline-none text-white appearance-none">
-                    <option value="">관심 과정을 선택하세요</option>
-                    <option value="warp">3-Day Warp (단기)</option>
-                    <option value="boot">4-Week Boot (정규)</option>
-                    <option value="lab">Startup Lab (창업)</option>
-                </select>
-                <textarea rows="3" placeholder="구현하고 싶은 AI 아이디어가 있나요? (선택)" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-green-500 outline-none text-white"></textarea>
-                
-                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-5 rounded-2xl text-lg mt-4 shadow-xl shadow-green-500/20 transition-all">
-                    상담 예약 및 자료 받기
+                <div>
+                    <h2 class="text-xl font-extrabold">관리자 대시보드</h2>
+                    <p class="text-slate-500 text-xs">Feelsogood AI Builder School</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="exportCSV()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-bold transition-all">
+                    <i data-lucide="download" class="w-4 h-4 text-green-400"></i> CSV 내보내기
                 </button>
-            </form>
+                <button onclick="clearAllData()" class="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 px-4 py-2 rounded-xl text-sm font-bold text-red-400 transition-all">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> 전체 삭제
+                </button>
+                <button onclick="closeAdmin()" class="p-2 text-slate-400 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
         </div>
-    </div>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] hidden">
-        <div class="bg-green-500 text-white px-8 py-4 rounded-full shadow-2xl font-bold flex items-center">
-            <i data-lucide="check-circle" class="mr-2"></i>
-            신청이 완료되었습니다! 안내 메일을 확인해주세요.
+        <!-- 통계 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 border-b border-slate-800">
+            <div class="bg-slate-800/60 rounded-2xl p-5">
+                <div class="text-3xl font-extrabold text-green-400" id="stat_total">0</div>
+                <div class="text-slate-500 text-xs mt-1 uppercase tracking-wide">총 신청</div>
+            </div>
+            <div class="bg-slate-800/60 rounded-2xl p-5">
+                <div class="text-3xl font-extrabold text-blue-400" id="stat_warp">0</div>
+                <div class="text-slate-500 text-xs mt-1 uppercase tracking-wide">3-Day Warp</div>
+            </div>
+            <div class="bg-slate-800/60 rounded-2xl p-5">
+                <div class="text-3xl font-extrabold text-amber-400" id="stat_boot">0</div>
+                <div class="text-slate-500 text-xs mt-1 uppercase tracking-wide">4-Week Boot</div>
+            </div>
+            <div class="bg-slate-800/60 rounded-2xl p-5">
+                <div class="text-3xl font-extrabold text-pink-400" id="stat_lab">0</div>
+                <div class="text-slate-500 text-xs mt-1 uppercase tracking-wide">Startup Lab</div>
+            </div>
         </div>
-    </div>
 
-    <script>
-        lucide.createIcons();
-        function openModal() { document.getElementById('applyModal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
-        function closeModal() { document.getElementById('applyModal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
-        function handleApply(e) { e.preventDefault(); closeModal(); const t = document.getElementById('toast'); t.classList.remove('hidden'); setTimeout(() => t.classList.add('hidden'), 3000); }
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => { anchor.addEventListener('click', function (e) { e.preventDefault(); document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' }); }); });
-    </script>
+        <!-- 검색 -->
+        <div class="px-6 py-4 border-b border-slate-800">
+            <input type="text" id="adminSearch" placeholder="이름, 이메일, 연락처로 검색..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-green-500 text-white" oninput="renderTable()">
+        </div>
+
+        <!-- 테이블 -->
+        <div class="overflow-auto flex-1 p-4">
+            <table class="admin-table w-full text-white" style="border-collapse: collapse; min-width: 900px;">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>신청일시</th>
+                        <th>성함</th>
+                        <th>연락처</th>
+                        <th>이메일</th>
+                        <th>과정</th>
+                        <th>레벨</th>
+                        <th>아이디어</th>
+                        <th>삭제</th>
+                    </tr>
+                </thead>
+                <tbody id="adminTableBody">
+                    <tr><td colspan="9" class="text-center text-slate-500 py-12">신청 데이터가 없습니다.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Toast ── -->
+<div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[400] hidden">
+    <div id="toastContent" class="bg-green-500 text-white px-8 py-4 rounded-full shadow-2xl font-bold flex items-center gap-2 toast-anim">
+        <i data-lucide="check-circle" class="w-5 h-5"></i>
+        <span id="toastMsg">완료!</span>
+    </div>
+</div>
+
+<!-- ================================================================
+  SCRIPTS
+================================================================ -->
+<script>
+// ─── EmailJS 초기화 ───
+(function(){
+    if(typeof emailjs !== 'undefined') {
+        emailjs.init(CONFIG.emailjs.publicKey);
+    }
+})();
+
+// ─── 로고 클릭 카운터 (5번 클릭 → 관리자 로그인) ───
+let logoClicks = 0, logoTimer = null;
+document.getElementById('logoClickArea').addEventListener('click', function(){
+    logoClicks++;
+    clearTimeout(logoTimer);
+    if(logoClicks >= 5){
+        logoClicks = 0;
+        openAdminLogin();
+    } else {
+        logoTimer = setTimeout(()=> logoClicks = 0, 3000);
+    }
+});
+
+// ─── 신청 모달 ───
+function openModal(preselect) {
+    document.getElementById('applyModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    if(preselect) {
+        const sel = document.getElementById('f_course');
+        for(let i=0; i<sel.options.length; i++){
+            if(sel.options[i].value.includes(preselect)) { sel.selectedIndex = i; break; }
+        }
+    }
+}
+function closeModal() {
+    document.getElementById('applyModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// ─── 폼 제출 ───
+async function handleApply(e) {
+    e.preventDefault();
+    const name   = document.getElementById('f_name').value.trim();
+    const phone  = document.getElementById('f_phone').value.trim();
+    const email  = document.getElementById('f_email').value.trim();
+    const course = document.getElementById('f_course').value;
+    const level  = document.getElementById('f_level').value;
+    const idea   = document.getElementById('f_idea').value.trim();
+    const errDiv = document.getElementById('formError');
+
+    if(!course){ errDiv.textContent = '관심 과정을 선택해 주세요.'; errDiv.classList.remove('hidden'); return; }
+    errDiv.classList.add('hidden');
+
+    const now = new Date().toLocaleString('ko-KR');
+    const entry = { id: Date.now(), date: now, name, phone, email, course, level: level||'미응답', idea: idea||'없음' };
+
+    // localStorage 저장
+    const apps = JSON.parse(localStorage.getItem('fsg_applications') || '[]');
+    apps.unshift(entry);
+    localStorage.setItem('fsg_applications', JSON.stringify(apps));
+
+    // EmailJS 발송
+    const submitBtn = document.getElementById('submitBtn');
+    document.getElementById('submitText').classList.add('hidden');
+    document.getElementById('submitLoading').classList.remove('hidden');
+    submitBtn.disabled = true;
+
+    try {
+        if(typeof emailjs !== 'undefined' && CONFIG.emailjs.publicKey !== 'YOUR_PUBLIC_KEY') {
+            await emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templateId, {
+                to_email:  CONFIG.adminEmail,
+                from_name: name,
+                from_email: email,
+                phone:     phone,
+                course:    course,
+                level:     level || '미응답',
+                idea:      idea  || '없음',
+                date:      now,
+                reply_to:  email,
+            });
+        }
+    } catch(err) {
+        console.warn('EmailJS 발송 실패 (설정 확인 필요):', err);
+    }
+
+    document.getElementById('submitText').classList.remove('hidden');
+    document.getElementById('submitLoading').classList.add('hidden');
+    submitBtn.disabled = false;
+
+    closeModal();
+    document.getElementById('applyForm').reset();
+    showToast('✅ 신청 완료! 24시간 내 연락드립니다.');
+
+    // 잔여석 감소
+    updateSeats(-1);
+}
+
+// ─── 잔여석 업데이트 ───
+let seats = parseInt(localStorage.getItem('fsg_seats') || '7');
+function updateSeats(delta) {
+    seats = Math.max(0, seats + delta);
+    localStorage.setItem('fsg_seats', seats);
+    document.querySelectorAll('#remainSeats, #remainSeats2').forEach(el => el.textContent = seats);
+}
+document.querySelectorAll('#remainSeats, #remainSeats2').forEach(el => el.textContent = seats);
+
+// ─── 관리자 로그인 ───
+function openAdminLogin() {
+    document.getElementById('adminLoginModal').style.display = 'flex';
+    setTimeout(()=> document.getElementById('adminPwInput').focus(), 100);
+}
+function closeAdminLogin() {
+    document.getElementById('adminLoginModal').style.display = 'none';
+    document.getElementById('adminPwInput').value = '';
+    document.getElementById('adminPwError').classList.add('hidden');
+}
+function checkAdminPw() {
+    const pw = document.getElementById('adminPwInput').value;
+    if(pw === CONFIG.adminPassword) {
+        closeAdminLogin();
+        openAdmin();
+    } else {
+        document.getElementById('adminPwError').classList.remove('hidden');
+        document.getElementById('adminPwInput').value = '';
+        document.getElementById('adminPwInput').focus();
+    }
+}
+
+// ─── 관리자 패널 ───
+function openAdmin() {
+    document.getElementById('adminPanel').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    renderTable();
+}
+function closeAdmin() {
+    document.getElementById('adminPanel').classList.remove('open');
+    document.body.style.overflow = 'auto';
+}
+
+function getApps() { return JSON.parse(localStorage.getItem('fsg_applications') || '[]'); }
+
+function renderTable() {
+    const apps = getApps();
+    const q = (document.getElementById('adminSearch')?.value || '').toLowerCase();
+    const filtered = q ? apps.filter(a =>
+        a.name.toLowerCase().includes(q) ||
+        a.email.toLowerCase().includes(q) ||
+        a.phone.includes(q)
+    ) : apps;
+
+    // Stats
+    document.getElementById('stat_total').textContent = apps.length;
+    document.getElementById('stat_warp').textContent  = apps.filter(a => a.course.includes('Warp')).length;
+    document.getElementById('stat_boot').textContent  = apps.filter(a => a.course.includes('Boot')).length;
+    document.getElementById('stat_lab').textContent   = apps.filter(a => a.course.includes('Lab')).length;
+
+    const tbody = document.getElementById('adminTableBody');
+    if(!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-slate-500 py-12">신청 데이터가 없습니다.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = filtered.map((a, i) => `
+        <tr>
+            <td class="text-slate-500">${i+1}</td>
+            <td class="text-slate-400 text-xs whitespace-nowrap">${a.date}</td>
+            <td class="font-bold">${esc(a.name)}</td>
+            <td>${esc(a.phone)}</td>
+            <td class="text-blue-400">${esc(a.email)}</td>
+            <td>
+                <span class="px-2 py-0.5 rounded-full text-xs font-bold ${
+                    a.course.includes('Boot') ? 'bg-green-500/20 text-green-400' :
+                    a.course.includes('Lab')  ? 'bg-blue-500/20 text-blue-400' :
+                                                'bg-slate-700 text-slate-300'
+                }">${esc(a.course)}</span>
+            </td>
+            <td class="text-slate-400 text-xs">${esc(a.level)}</td>
+            <td class="text-slate-400 text-xs max-w-xs truncate" title="${esc(a.idea)}">${esc(a.idea)}</td>
+            <td>
+                <button onclick="deleteEntry(${a.id})" class="text-red-500 hover:text-red-300 transition-colors">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    lucide.createIcons();
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function deleteEntry(id) {
+    if(!confirm('이 신청 데이터를 삭제하시겠습니까?')) return;
+    const apps = getApps().filter(a => a.id !== id);
+    localStorage.setItem('fsg_applications', JSON.stringify(apps));
+    renderTable();
+    showToast('삭제되었습니다.');
+}
+
+function clearAllData() {
+    if(!confirm('⚠️ 모든 신청 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+    localStorage.removeItem('fsg_applications');
+    renderTable();
+    showToast('전체 데이터가 삭제되었습니다.', 'red');
+}
+
+function exportCSV() {
+    const apps = getApps();
+    if(!apps.length) { showToast('내보낼 데이터가 없습니다.', 'red'); return; }
+    const header = ['번호','신청일시','성함','연락처','이메일','과정','레벨','아이디어'];
+    const rows = apps.map((a,i) => [i+1, a.date, a.name, a.phone, a.email, a.course, a.level, a.idea]);
+    const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='feelsogood_applications_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+    URL.revokeObjectURL(url);
+    showToast('CSV 파일이 다운로드되었습니다!');
+}
+
+// ─── Toast ───
+let toastTimer;
+function showToast(msg, color='green') {
+    clearTimeout(toastTimer);
+    const t = document.getElementById('toast');
+    const tc = document.getElementById('toastContent');
+    document.getElementById('toastMsg').textContent = msg;
+    tc.className = `${color==='red' ? 'bg-red-500' : 'bg-green-500'} text-white px-8 py-4 rounded-full shadow-2xl font-bold flex items-center gap-2 toast-anim`;
+    t.classList.remove('hidden');
+    toastTimer = setTimeout(() => t.classList.add('hidden'), 3500);
+}
+
+// ─── FAQ 토글 ───
+function toggleFaq(btn) {
+    const body = btn.nextElementSibling;
+    const icon = btn.querySelector('[data-lucide]');
+    body.classList.toggle('hidden');
+    if(icon) icon.style.transform = body.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+// ─── 숫자 카운터 애니메이션 ───
+function animateCounters() {
+    document.querySelectorAll('[data-target]').forEach(el => {
+        const target = parseInt(el.getAttribute('data-target'));
+        const duration = 1800;
+        const start = performance.now();
+        function update(now) {
+            const t = Math.min((now - start) / duration, 1);
+            const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+            el.textContent = Math.floor(ease * target) + (el.getAttribute('data-target').toString().includes('%') ? '%' : '+');
+            if(t < 1) requestAnimationFrame(update);
+            else el.textContent = target + '+';
+        }
+        requestAnimationFrame(update);
+    });
+}
+
+// ─── Intersection Observer (카운터 트리거) ───
+const statsSection = document.querySelector('[data-target]');
+if(statsSection) {
+    const obs = new IntersectionObserver((entries) => {
+        if(entries[0].isIntersecting){ animateCounters(); obs.disconnect(); }
+    }, { threshold: 0.3 });
+    obs.observe(statsSection);
+}
+
+// ─── 앵커 스무스 스크롤 ───
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if(target){ e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+});
+
+// ─── Lucide 아이콘 초기화 ───
+lucide.createIcons();
+</script>
 </body>
 </html>
-
